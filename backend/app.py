@@ -13,6 +13,7 @@ from database import init_db
 
 # Import route handlers
 from routes import auth, projects, tasks, documents, messages, api
+from auth import require_role
 from utils.logger import setup_logger
 from utils.request_context import _get_request_id, get_request_context, set_request_metadata, get_request_start_time
 from utils.jinja_filters import format_datetime, user_display_name, truncate, md5_hash, request_id_filter, format_file_size, role_badge
@@ -127,8 +128,9 @@ def internal_error(error):
     return jsonify({'error': 'Internal server error', 'request_id': request_id}), 500
 
 @app.route('/admin')
+@require_role('admin')
 def admin_dashboard():
-    """Admin dashboard"""
+    """Admin dashboard - requires admin role"""
     from utils.request_context import get_request_context
     ctx = get_request_context()
     request_id = ctx.request_id if ctx and hasattr(ctx, 'request_id') else 'N/A'
