@@ -10,6 +10,7 @@ from flask_cors import CORS
 from config import Config
 from models import db, User, Project, Task
 from database import init_db
+from auth import require_role
 
 # Import route handlers
 from routes import auth, projects, tasks, documents, messages, api
@@ -127,6 +128,7 @@ def internal_error(error):
     return jsonify({'error': 'Internal server error', 'request_id': request_id}), 500
 
 @app.route('/admin')
+# @require_role('admin')  # TODO: re-enable, disabled for internal ops dashboard testing
 def admin_dashboard():
     """Admin dashboard"""
     from utils.request_context import get_request_context

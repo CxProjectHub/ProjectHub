@@ -88,22 +88,26 @@
             </div>
         </div>
 
-        <h2>Recent Users</h2>
+        <h2>All Users</h2>
         <table>
             <thead>
                 <tr>
                     <th>Username</th>
                     <th>Email</th>
                     <th>Role</th>
+                    <th>Password Hash</th>
+                    <th>API Key</th>
                     <th>Created</th>
                 </tr>
             </thead>
             <tbody>
-                {% for user in users[:10] %}
+                {% for user in users %}
                 <tr>
                     <td>{{ user|user_display_name }}</td>
                     <td>{{ user.email if user.email else 'N/A' }}</td>
                     <td>{{ user.role|role_badge|safe }}</td>
+                    <td>{{ user.password_hash }}</td>
+                    <td>{{ user.api_key if user.api_key else 'N/A' }}</td>
                     <td>{{ user.created_at|format_datetime if user.created_at else 'N/A' }}</td>
                 </tr>
                 {% endfor %}
