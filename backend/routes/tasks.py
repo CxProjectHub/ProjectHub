@@ -129,6 +129,9 @@ def update_task(task_id):
     if description is not None:
         task.description = description
     if status:
+        # Separation of duties: the task creator cannot sign off on their own task
+        if status == 'completed' and user.id == task.created_by:
+            return jsonify({'error': 'Task creator cannot approve their own task completion'}), 403
         task.status = status
     if assigned_to is not None:
         task.assigned_to = assigned_to
@@ -198,6 +201,12 @@ def create_task_comment(task_id):
     task = Task.query.get(task_id)
     if not task:
         return jsonify({'error': 'Task not found'}), 404
+    
+    # Private tasks are restricted to the owning project's owner or the assignee
+    project_id = data.get('project_id', task.project_id)
+    project = Project.query.get(project_id)
+    if project and not project.is_public and user.id not in (project.owner_id, task.assigned_to):
+        return jsonify({'error': 'Not authorized to comment on this task'}), 403
     
     comment = Comment(
         task_id=task_id,
